@@ -181,6 +181,8 @@ function makeDesktopBridge(overrides: Partial<DesktopBridge> = {}): DesktopBridg
       endpointUrl: null,
       advertisedHost: null,
     }),
+    getAmbxstTheme: async () => null,
+    onAmbxstTheme: () => () => undefined,
     pickFolder: async () => null,
     confirm: async () => true,
     setTheme: async () => undefined,

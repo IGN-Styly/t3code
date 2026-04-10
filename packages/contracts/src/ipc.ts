@@ -147,6 +147,58 @@ export interface PickFolderOptions {
   initialPath?: string | null;
 }
 
+export interface DesktopAmbxstPalette {
+  background: string;
+  surface: string;
+  surfaceBright: string;
+  surfaceContainer: string;
+  surfaceContainerHigh: string;
+  surfaceContainerHighest: string;
+  surfaceContainerLow: string;
+  surfaceContainerLowest: string;
+  surfaceDim: string;
+  surfaceTint: string;
+  surfaceVariant: string;
+  outline: string;
+  outlineVariant: string;
+  primary: string;
+  primaryContainer: string;
+  secondary: string;
+  secondaryContainer: string;
+  tertiary: string;
+  tertiaryContainer: string;
+  error: string;
+  errorContainer: string;
+  blue: string;
+  green: string;
+  yellow: string;
+  overBackground: string;
+  overSurface: string;
+  overSurfaceVariant: string;
+  overPrimary: string;
+  overPrimaryContainer: string;
+  overSecondary: string;
+  overSecondaryContainer: string;
+  overTertiary: string;
+  overTertiaryContainer: string;
+  overError: string;
+  overErrorContainer: string;
+  overBlue: string;
+  overGreen: string;
+  overYellow: string;
+  shadow: string;
+  sourceColor: string;
+}
+
+export interface DesktopAmbxstThemeSnapshot {
+  mode: "light" | "dark";
+  oledMode: boolean;
+  roundness: number;
+  font: string;
+  monoFont: string;
+  colors: DesktopAmbxstPalette;
+}
+
 export interface DesktopBridge {
   getAppBranding: () => DesktopAppBranding | null;
   getLocalEnvironmentBootstrap: () => DesktopEnvironmentBootstrap | null;
@@ -161,6 +213,8 @@ export interface DesktopBridge {
   removeSavedEnvironmentSecret: (environmentId: EnvironmentId) => Promise<void>;
   getServerExposureState: () => Promise<DesktopServerExposureState>;
   setServerExposureMode: (mode: DesktopServerExposureMode) => Promise<DesktopServerExposureState>;
+  getAmbxstTheme: () => Promise<DesktopAmbxstThemeSnapshot | null>;
+  onAmbxstTheme: (listener: (snapshot: DesktopAmbxstThemeSnapshot | null) => void) => () => void;
   pickFolder: (options?: PickFolderOptions) => Promise<string | null>;
   confirm: (message: string) => Promise<boolean>;
   setTheme: (theme: DesktopTheme) => Promise<void>;

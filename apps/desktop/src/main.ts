@@ -61,6 +61,7 @@ import { waitForBackendStartupReady } from "./backendStartupReadiness.ts";
 import { getAutoUpdateDisabledReason, shouldBroadcastDownloadProgress } from "./updateState.ts";
 import { doesVersionMatchDesktopUpdateChannel } from "./updateChannels.ts";
 import { ServerListeningDetector } from "./serverListeningDetector.ts";
+import { AmbxstThemeMonitor } from "./ambxstTheme.ts";
 import {
   createInitialDesktopUpdateState,
   reduceDesktopUpdateStateOnCheckFailure,
@@ -82,6 +83,8 @@ syncShellEnvironment();
 const PICK_FOLDER_CHANNEL = "desktop:pick-folder";
 const CONFIRM_CHANNEL = "desktop:confirm";
 const SET_THEME_CHANNEL = "desktop:set-theme";
+const GET_AMBXST_THEME_CHANNEL = "desktop:get-ambxst-theme";
+const AMBXST_THEME_CHANNEL = "desktop:ambxst-theme";
 const CONTEXT_MENU_CHANNEL = "desktop:context-menu";
 const OPEN_EXTERNAL_CHANNEL = "desktop:open-external";
 const MENU_ACTION_CHANNEL = "desktop:menu-action";
@@ -216,6 +219,7 @@ let backendListeningDetector: ServerListeningDetector | null = null;
 let restartAttempt = 0;
 let restartTimer: ReturnType<typeof setTimeout> | null = null;
 let isQuitting = false;
+let ambxstThemeMonitor: AmbxstThemeMonitor | null = null;
 let desktopProtocolRegistered = false;
 let aboutCommitHashCache: string | null | undefined;
 let desktopLogSink: RotatingFileSink | null = null;
@@ -1113,6 +1117,14 @@ function emitUpdateState(): void {
   }
 }
 
+function emitAmbxstTheme(): void {
+  const snapshot = ambxstThemeMonitor?.getSnapshot() ?? null;
+  for (const window of BrowserWindow.getAllWindows()) {
+    if (window.isDestroyed()) continue;
+    window.webContents.send(AMBXST_THEME_CHANNEL, snapshot);
+  }
+}
+
 function setUpdateState(patch: Partial<DesktopUpdateState>): void {
   updateState = { ...updateState, ...patch };
   emitUpdateState();
@@ -1669,6 +1681,9 @@ function registerIpcHandlers(): void {
     return nextState;
   });
 
+  ipcMain.removeHandler(GET_AMBXST_THEME_CHANNEL);
+  ipcMain.handle(GET_AMBXST_THEME_CHANNEL, async () => ambxstThemeMonitor?.getSnapshot() ?? null);
+
   ipcMain.removeHandler(PICK_FOLDER_CHANNEL);
   ipcMain.handle(PICK_FOLDER_CHANNEL, async (_event, rawOptions: unknown) => {
     const owner = BrowserWindow.getFocusedWindow() ?? mainWindow;
@@ -2036,6 +2051,10 @@ configureAppIdentity();
 
 async function bootstrap(): Promise<void> {
   writeDesktopLogHeader("bootstrap start");
+  ambxstThemeMonitor = new AmbxstThemeMonitor();
+  ambxstThemeMonitor.subscribe(() => {
+    emitAmbxstTheme();
+  });
   const configuredBackendPort = resolveConfiguredDesktopBackendPort(process.env.T3CODE_PORT);
   if (isDevelopment && configuredBackendPort === undefined) {
     throw new Error("T3CODE_PORT is required in desktop development.");
@@ -2107,6 +2126,8 @@ app.on("before-quit", () => {
   isQuitting = true;
   updateInstallInFlight = false;
   writeDesktopLogHeader("before-quit received");
+  ambxstThemeMonitor?.dispose();
+  ambxstThemeMonitor = null;
   clearUpdatePollTimer();
   cancelBackendReadinessWait();
   stopBackend();

@@ -25,7 +25,7 @@ import { ProviderModelPicker } from "../chat/ProviderModelPicker";
 import { TraitsPicker } from "../chat/TraitsPicker";
 import { resolveAndPersistPreferredEditor } from "../../editorPreferences";
 import { isElectron } from "../../env";
-import { useTheme } from "../../hooks/useTheme";
+import { type Theme, useTheme } from "../../hooks/useTheme";
 import { useSettings, useUpdateSettings } from "../../hooks/useSettings";
 import { useThreadActions } from "../../hooks/useThreadActions";
 import {
@@ -88,6 +88,11 @@ const THEME_OPTIONS = [
     label: "Dark",
   },
 ] as const;
+
+const AMBXST_THEME_OPTION = {
+  value: "ambxst",
+  label: "Ambxst",
+} as const satisfies { value: Theme; label: string };
 
 const TIMESTAMP_FORMAT_LABELS = {
   locale: "System default",
@@ -491,7 +496,7 @@ export function useSettingsRestore(onRestored?: () => void) {
 }
 
 export function GeneralSettingsPanel() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, ambxstAvailable } = useTheme();
   const settings = useSettings();
   const { updateSettings } = useUpdateSettings();
   const [openingPathByTarget, setOpeningPathByTarget] = useState({
@@ -834,12 +839,23 @@ export function GeneralSettingsPanel() {
     });
   };
 
+  const themeOptions = useMemo(
+    () =>
+      ambxstAvailable || theme === "ambxst"
+        ? [...THEME_OPTIONS, AMBXST_THEME_OPTION]
+        : THEME_OPTIONS,
+    [ambxstAvailable, theme],
+  );
   return (
     <SettingsPageContainer>
       <SettingsSection title="General">
         <SettingsRow
           title="Theme"
-          description="Choose how T3 Code looks across the app."
+          description={
+            ambxstAvailable
+              ? "Choose how T3 Code looks across the app, or follow your current Ambxst palette."
+              : "Choose how T3 Code looks across the app."
+          }
           resetAction={
             theme !== "system" ? (
               <SettingResetButton label="theme" onClick={() => setTheme("system")} />
@@ -849,18 +865,23 @@ export function GeneralSettingsPanel() {
             <Select
               value={theme}
               onValueChange={(value) => {
-                if (value === "system" || value === "light" || value === "dark") {
+                if (
+                  value === "system" ||
+                  value === "light" ||
+                  value === "dark" ||
+                  value === "ambxst"
+                ) {
                   setTheme(value);
                 }
               }}
             >
               <SelectTrigger className="w-full sm:w-40" aria-label="Theme preference">
                 <SelectValue>
-                  {THEME_OPTIONS.find((option) => option.value === theme)?.label ?? "System"}
+                  {themeOptions.find((option) => option.value === theme)?.label ?? "System"}
                 </SelectValue>
               </SelectTrigger>
               <SelectPopup align="end" alignItemWithTrigger={false}>
-                {THEME_OPTIONS.map((option) => (
+                {themeOptions.map((option) => (
                   <SelectItem hideIndicator key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>

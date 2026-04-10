@@ -4,6 +4,8 @@ import type { DesktopBridge } from "@t3tools/contracts";
 const PICK_FOLDER_CHANNEL = "desktop:pick-folder";
 const CONFIRM_CHANNEL = "desktop:confirm";
 const SET_THEME_CHANNEL = "desktop:set-theme";
+const GET_AMBXST_THEME_CHANNEL = "desktop:get-ambxst-theme";
+const AMBXST_THEME_CHANNEL = "desktop:ambxst-theme";
 const CONTEXT_MENU_CHANNEL = "desktop:context-menu";
 const OPEN_EXTERNAL_CHANNEL = "desktop:open-external";
 const MENU_ACTION_CHANNEL = "desktop:menu-action";
@@ -53,6 +55,18 @@ contextBridge.exposeInMainWorld("desktopBridge", {
     ipcRenderer.invoke(REMOVE_SAVED_ENVIRONMENT_SECRET_CHANNEL, environmentId),
   getServerExposureState: () => ipcRenderer.invoke(GET_SERVER_EXPOSURE_STATE_CHANNEL),
   setServerExposureMode: (mode) => ipcRenderer.invoke(SET_SERVER_EXPOSURE_MODE_CHANNEL, mode),
+  getAmbxstTheme: () => ipcRenderer.invoke(GET_AMBXST_THEME_CHANNEL),
+  onAmbxstTheme: (listener) => {
+    const wrappedListener = (_event: Electron.IpcRendererEvent, snapshot: unknown) => {
+      if (typeof snapshot !== "object" && snapshot !== null) return;
+      listener(snapshot as Parameters<typeof listener>[0]);
+    };
+
+    ipcRenderer.on(AMBXST_THEME_CHANNEL, wrappedListener);
+    return () => {
+      ipcRenderer.removeListener(AMBXST_THEME_CHANNEL, wrappedListener);
+    };
+  },
   pickFolder: (options) => ipcRenderer.invoke(PICK_FOLDER_CHANNEL, options),
   confirm: (message) => ipcRenderer.invoke(CONFIRM_CHANNEL, message),
   setTheme: (theme) => ipcRenderer.invoke(SET_THEME_CHANNEL, theme),

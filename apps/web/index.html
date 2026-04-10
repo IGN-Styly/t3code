@@ -15,17 +15,34 @@
       (() => {
         const LIGHT_BACKGROUND = "#ffffff";
         const DARK_BACKGROUND = "#161616";
+        const AMBXST_THEME_BACKGROUND_STORAGE_KEY = "t3code:ambxst-background";
+        const AMBXST_THEME_MODE_STORAGE_KEY = "t3code:ambxst-mode";
         const themeColorMeta = document.querySelector('meta[name="theme-color"]');
         try {
           const storedTheme = window.localStorage.getItem("t3code:theme");
           const theme =
-            storedTheme === "light" || storedTheme === "dark" || storedTheme === "system"
+            storedTheme === "light" ||
+            storedTheme === "dark" ||
+            storedTheme === "system" ||
+            storedTheme === "ambxst"
               ? storedTheme
               : "system";
           const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-          const isDark = theme === "dark" || (theme === "system" && prefersDark);
+          const cachedAmbxstMode = window.localStorage.getItem(AMBXST_THEME_MODE_STORAGE_KEY);
+          const cachedAmbxstBackground = window.localStorage.getItem(
+            AMBXST_THEME_BACKGROUND_STORAGE_KEY,
+          );
+          const isDark =
+            theme === "dark" ||
+            (theme === "system" && prefersDark) ||
+            (theme === "ambxst" && cachedAmbxstMode !== "light");
           document.documentElement.classList.toggle("dark", isDark);
-          const chromeColor = isDark ? DARK_BACKGROUND : LIGHT_BACKGROUND;
+          const chromeColor =
+            theme === "ambxst" && cachedAmbxstBackground
+              ? cachedAmbxstBackground
+              : isDark
+                ? DARK_BACKGROUND
+                : LIGHT_BACKGROUND;
           document.documentElement.style.backgroundColor = chromeColor;
           themeColorMeta?.setAttribute("content", chromeColor);
         } catch {
