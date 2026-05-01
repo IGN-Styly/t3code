@@ -162,7 +162,7 @@ const PROVIDER_SETTINGS: readonly InstallProviderSettings[] = [
     binaryPlaceholder: "OpenCode binary path",
     binaryDescription: "Path to the OpenCode binary",
     serverUrlPlaceholder: "http://127.0.0.1:4096",
-    serverUrlDescription: "Leave blank to let T3 Code spawn the server when needed",
+    serverUrlDescription: "Leave blank to let k3code spawn the server when needed",
     serverPasswordPlaceholder: "Server password (optional)",
     serverPasswordDescription:
       "If your OpenCode server requires authentication, enter the password here. NOTE: Stored in plain text on disk",
@@ -853,8 +853,8 @@ export function GeneralSettingsPanel() {
           title="Theme"
           description={
             ambxstAvailable
-              ? "Choose how T3 Code looks across the app, or follow your current Ambxst palette."
-              : "Choose how T3 Code looks across the app."
+              ? "Choose how k3code looks across the app, or follow your current Ambxst palette."
+              : "Choose how k3code looks across the app."
           }
           resetAction={
             theme !== "system" ? (

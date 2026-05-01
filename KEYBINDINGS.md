@@ -1,6 +1,6 @@
 # Keybindings
 
-T3 Code reads keybindings from:
+k3code reads keybindings from:
 
 - `~/.t3/keybindings.json`
 
