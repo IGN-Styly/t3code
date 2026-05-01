@@ -57,8 +57,8 @@ function hasAmbxstBridge() {
   if (typeof window === "undefined") return false;
   return Boolean(
     window.desktopBridge &&
-      typeof window.desktopBridge.getAmbxstTheme === "function" &&
-      typeof window.desktopBridge.onAmbxstTheme === "function",
+    typeof window.desktopBridge.getAmbxstTheme === "function" &&
+    typeof window.desktopBridge.onAmbxstTheme === "function",
   );
 }
 
