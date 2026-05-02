@@ -1,5 +1,5 @@
 import { ProviderDriverKind } from "@t3tools/contracts";
-import { ClaudeAI, CursorIcon, type Icon, OpenAI, OpenCodeIcon } from "../Icons";
+import { ClaudeAI, CursorIcon, type Icon, OpenAI, OpenCodeIcon, PiAgentIcon } from "../Icons";
 
 /**
  * A single editable field exposed on a provider instance. `key` must match
@@ -110,6 +110,12 @@ export const DRIVER_OPTIONS: readonly DriverOption[] = [
     ],
   },
   {
+    value: ProviderDriverKind.make("pi"),
+    label: "Pi",
+    icon: PiAgentIcon,
+    fields: [],
+  },
+  {
     value: ProviderDriverKind.make("opencode"),
     label: "OpenCode",
     icon: OpenCodeIcon,
@@ -124,7 +130,7 @@ export const DRIVER_OPTIONS: readonly DriverOption[] = [
         key: "serverUrl",
         label: "Server URL",
         placeholder: "http://127.0.0.1:4096",
-        description: "Leave blank to let T3 Code spawn the server when needed.",
+        description: "Leave blank to let k3code spawn the server when needed.",
       },
       {
         key: "serverPassword",

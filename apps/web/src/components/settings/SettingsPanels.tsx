@@ -157,12 +157,18 @@ const PROVIDER_SETTINGS: readonly InstallProviderSettings[] = [
     binaryDescription: "Path to the Cursor agent binary",
   },
   {
+    provider: ProviderDriverKind.make("pi"),
+    title: "Pi",
+    binaryPlaceholder: "Embedded Pi harness",
+    binaryDescription: "Uses the embedded Pi SDK and your existing ~/.pi/agent authentication.",
+  },
+  {
     provider: ProviderDriverKind.make("opencode"),
     title: "OpenCode",
     binaryPlaceholder: "OpenCode binary path",
     binaryDescription: "Path to the OpenCode binary",
     serverUrlPlaceholder: "http://127.0.0.1:4096",
-    serverUrlDescription: "Leave blank to let T3 Code spawn the server when needed",
+    serverUrlDescription: "Leave blank to let k3code spawn the server when needed",
     serverPasswordPlaceholder: "Server password (optional)",
     serverPasswordDescription:
       "If your OpenCode server requires authentication, enter the password here. NOTE: Stored in plain text on disk",
@@ -853,8 +859,8 @@ export function GeneralSettingsPanel() {
           title="Theme"
           description={
             ambxstAvailable
-              ? "Choose how T3 Code looks across the app, or follow your current Ambxst palette."
-              : "Choose how T3 Code looks across the app."
+              ? "Choose how k3code looks across the app, or follow your current Ambxst palette."
+              : "Choose how k3code looks across the app."
           }
           resetAction={
             theme !== "system" ? (
@@ -953,6 +959,35 @@ export function GeneralSettingsPanel() {
               checked={settings.diffWordWrap}
               onCheckedChange={(checked) => updateSettings({ diffWordWrap: Boolean(checked) })}
               aria-label="Wrap diff lines by default"
+            />
+          }
+        />
+
+        <SettingsRow
+          title="Window controls"
+          description={
+            isElectron ? "Hide the desktop minimize, maximize, and close buttons." : "Desktop only."
+          }
+          resetAction={
+            settings.hideWindowControls !== DEFAULT_UNIFIED_SETTINGS.hideWindowControls ? (
+              <SettingResetButton
+                label="window controls"
+                onClick={() =>
+                  updateSettings({
+                    hideWindowControls: DEFAULT_UNIFIED_SETTINGS.hideWindowControls,
+                  })
+                }
+              />
+            ) : null
+          }
+          control={
+            <Switch
+              checked={settings.hideWindowControls}
+              disabled={!isElectron}
+              onCheckedChange={(checked) =>
+                updateSettings({ hideWindowControls: Boolean(checked) })
+              }
+              aria-label="Hide desktop window controls"
             />
           }
         />
