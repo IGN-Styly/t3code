@@ -1,5 +1,5 @@
 import { ProviderDriverKind } from "@t3tools/contracts";
-import { ClaudeAI, CursorIcon, type Icon, OpenAI, OpenCodeIcon } from "../Icons";
+import { ClaudeAI, CursorIcon, type Icon, OpenAI, OpenCodeIcon, PiAgentIcon } from "../Icons";
 
 /**
  * A single editable field exposed on a provider instance. `key` must match
@@ -108,6 +108,12 @@ export const DRIVER_OPTIONS: readonly DriverOption[] = [
         description: "Override the Cursor API endpoint for this instance.",
       },
     ],
+  },
+  {
+    value: ProviderDriverKind.make("pi"),
+    label: "Pi",
+    icon: PiAgentIcon,
+    fields: [],
   },
   {
     value: ProviderDriverKind.make("opencode"),

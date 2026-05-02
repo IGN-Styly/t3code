@@ -33,6 +33,7 @@ export const ClientSettingsSchema = Schema.Struct({
   confirmThreadArchive: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
   confirmThreadDelete: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(true))),
   diffWordWrap: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
+  hideWindowControls: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
   // Model favorites. Historically keyed by provider kind, now
   // widened to `ProviderInstanceId` so users can favorite a specific model
   // on a custom provider instance (e.g. "Codex Personal · gpt-5") without
@@ -121,6 +122,13 @@ export const CursorSettings = Schema.Struct({
   customModels: Schema.Array(Schema.String).pipe(Schema.withDecodingDefault(Effect.succeed([]))),
 });
 export type CursorSettings = typeof CursorSettings.Type;
+
+export const PiSettings = Schema.Struct({
+  enabled: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(true))),
+  customModels: Schema.Array(Schema.String).pipe(Schema.withDecodingDefault(Effect.succeed([]))),
+});
+export type PiSettings = typeof PiSettings.Type;
+
 export const OpenCodeSettings = Schema.Struct({
   enabled: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(true))),
   binaryPath: makeBinaryPathSetting("opencode"),
@@ -161,6 +169,7 @@ export const ServerSettings = Schema.Struct({
     codex: CodexSettings.pipe(Schema.withDecodingDefault(Effect.succeed({}))),
     claudeAgent: ClaudeSettings.pipe(Schema.withDecodingDefault(Effect.succeed({}))),
     cursor: CursorSettings.pipe(Schema.withDecodingDefault(Effect.succeed({}))),
+    pi: PiSettings.pipe(Schema.withDecodingDefault(Effect.succeed({}))),
     opencode: OpenCodeSettings.pipe(Schema.withDecodingDefault(Effect.succeed({}))),
   }).pipe(Schema.withDecodingDefault(Effect.succeed({}))),
   // New driver-agnostic instance map. Keyed by `ProviderInstanceId`; values
@@ -229,6 +238,11 @@ const CursorSettingsPatch = Schema.Struct({
   customModels: Schema.optionalKey(Schema.Array(Schema.String)),
 });
 
+const PiSettingsPatch = Schema.Struct({
+  enabled: Schema.optionalKey(Schema.Boolean),
+  customModels: Schema.optionalKey(Schema.Array(Schema.String)),
+});
+
 const OpenCodeSettingsPatch = Schema.Struct({
   enabled: Schema.optionalKey(Schema.Boolean),
   binaryPath: Schema.optionalKey(Schema.String),
@@ -254,6 +268,7 @@ export const ServerSettingsPatch = Schema.Struct({
       codex: Schema.optionalKey(CodexSettingsPatch),
       claudeAgent: Schema.optionalKey(ClaudeSettingsPatch),
       cursor: Schema.optionalKey(CursorSettingsPatch),
+      pi: Schema.optionalKey(PiSettingsPatch),
       opencode: Schema.optionalKey(OpenCodeSettingsPatch),
     }),
   ),
@@ -270,6 +285,7 @@ export const ClientSettingsPatch = Schema.Struct({
   confirmThreadArchive: Schema.optionalKey(Schema.Boolean),
   confirmThreadDelete: Schema.optionalKey(Schema.Boolean),
   diffWordWrap: Schema.optionalKey(Schema.Boolean),
+  hideWindowControls: Schema.optionalKey(Schema.Boolean),
   favorites: Schema.optionalKey(
     Schema.Array(
       Schema.Struct({

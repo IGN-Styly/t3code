@@ -157,6 +157,12 @@ const PROVIDER_SETTINGS: readonly InstallProviderSettings[] = [
     binaryDescription: "Path to the Cursor agent binary",
   },
   {
+    provider: ProviderDriverKind.make("pi"),
+    title: "Pi",
+    binaryPlaceholder: "Embedded Pi harness",
+    binaryDescription: "Uses the embedded Pi SDK and your existing ~/.pi/agent authentication.",
+  },
+  {
     provider: ProviderDriverKind.make("opencode"),
     title: "OpenCode",
     binaryPlaceholder: "OpenCode binary path",
@@ -953,6 +959,35 @@ export function GeneralSettingsPanel() {
               checked={settings.diffWordWrap}
               onCheckedChange={(checked) => updateSettings({ diffWordWrap: Boolean(checked) })}
               aria-label="Wrap diff lines by default"
+            />
+          }
+        />
+
+        <SettingsRow
+          title="Window controls"
+          description={
+            isElectron ? "Hide the desktop minimize, maximize, and close buttons." : "Desktop only."
+          }
+          resetAction={
+            settings.hideWindowControls !== DEFAULT_UNIFIED_SETTINGS.hideWindowControls ? (
+              <SettingResetButton
+                label="window controls"
+                onClick={() =>
+                  updateSettings({
+                    hideWindowControls: DEFAULT_UNIFIED_SETTINGS.hideWindowControls,
+                  })
+                }
+              />
+            ) : null
+          }
+          control={
+            <Switch
+              checked={settings.hideWindowControls}
+              disabled={!isElectron}
+              onCheckedChange={(checked) =>
+                updateSettings({ hideWindowControls: Boolean(checked) })
+              }
+              aria-label="Hide desktop window controls"
             />
           }
         />

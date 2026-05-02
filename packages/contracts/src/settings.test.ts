@@ -2,10 +2,16 @@ import { describe, expect, it } from "vitest";
 import { Schema } from "effect";
 
 import { ProviderInstanceId } from "./providerInstance.ts";
-import { DEFAULT_SERVER_SETTINGS, ServerSettings, ServerSettingsPatch } from "./settings.ts";
+import {
+  ClientSettingsSchema,
+  DEFAULT_SERVER_SETTINGS,
+  ServerSettings,
+  ServerSettingsPatch,
+} from "./settings.ts";
 
 const decodeServerSettings = Schema.decodeUnknownSync(ServerSettings);
 const decodeServerSettingsPatch = Schema.decodeUnknownSync(ServerSettingsPatch);
+const decodeClientSettings = Schema.decodeUnknownSync(ClientSettingsSchema);
 
 describe("ServerSettings.providerInstances (slice-2 invariant)", () => {
   it("defaults to an empty record so legacy configs without the key still decode", () => {
@@ -18,6 +24,7 @@ describe("ServerSettings.providerInstances (slice-2 invariant)", () => {
     // Legacy `providers` struct is still hydrated with its per-driver defaults
     // so existing call sites keep working through the migration.
     expect(decoded.providers.codex.enabled).toBe(true);
+    expect(decoded.providers.pi.enabled).toBe(true);
   });
 
   it("decodes a multi-instance map mixing first-party and fork drivers", () => {
@@ -90,5 +97,11 @@ describe("ServerSettingsPatch.providerInstances", () => {
     });
     const ollamaId = ProviderInstanceId.make("ollama_local");
     expect(patch.providerInstances?.[ollamaId]?.driver).toBe("ollama");
+  });
+});
+
+describe("ClientSettingsSchema", () => {
+  it("defaults hideWindowControls to false", () => {
+    expect(decodeClientSettings({}).hideWindowControls).toBe(false);
   });
 });

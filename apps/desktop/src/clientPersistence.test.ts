@@ -53,6 +53,7 @@ const clientSettings: ClientSettings = {
   confirmThreadArchive: true,
   confirmThreadDelete: false,
   diffWordWrap: true,
+  hideWindowControls: false,
   favorites: [],
   providerModelPreferences: {},
   sidebarProjectGroupingMode: "repository_path",

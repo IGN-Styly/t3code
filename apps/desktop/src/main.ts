@@ -31,6 +31,7 @@ import type {
   DesktopUpdateCheckResult,
   DesktopUpdateState,
 } from "@t3tools/contracts";
+import { DEFAULT_CLIENT_SETTINGS } from "@t3tools/contracts/settings";
 import { autoUpdater } from "electron-updater";
 
 import type { ContextMenuItem } from "@t3tools/contracts";
@@ -228,6 +229,7 @@ let restoreStdIoCapture: (() => void) | null = null;
 let backendObservabilitySettings = readPersistedBackendObservabilitySettings();
 let desktopSettings = readDesktopSettings(DESKTOP_SETTINGS_PATH, app.getVersion());
 let desktopServerExposureMode: DesktopServerExposureMode = desktopSettings.serverExposureMode;
+let clientSettings = readClientSettings(CLIENT_SETTINGS_PATH) ?? DEFAULT_CLIENT_SETTINGS;
 
 let destructiveMenuIconCache: Electron.NativeImage | null | undefined;
 const expectedBackendExitChildren = new WeakSet<ChildProcess.ChildProcess>();
@@ -1580,7 +1582,7 @@ function registerIpcHandlers(): void {
   });
 
   ipcMain.removeHandler(GET_CLIENT_SETTINGS_CHANNEL);
-  ipcMain.handle(GET_CLIENT_SETTINGS_CHANNEL, async () => readClientSettings(CLIENT_SETTINGS_PATH));
+  ipcMain.handle(GET_CLIENT_SETTINGS_CHANNEL, async () => clientSettings);
 
   ipcMain.removeHandler(SET_CLIENT_SETTINGS_CHANNEL);
   ipcMain.handle(SET_CLIENT_SETTINGS_CHANNEL, async (_event, rawSettings: unknown) => {
@@ -1588,7 +1590,9 @@ function registerIpcHandlers(): void {
       throw new Error("Invalid client settings payload.");
     }
 
-    writeClientSettings(CLIENT_SETTINGS_PATH, rawSettings as ClientSettings);
+    clientSettings = rawSettings as ClientSettings;
+    writeClientSettings(CLIENT_SETTINGS_PATH, clientSettings);
+    syncAllWindowAppearance();
   });
 
   ipcMain.removeHandler(GET_SAVED_ENVIRONMENT_REGISTRY_CHANNEL);
@@ -1922,6 +1926,9 @@ function syncWindowAppearance(window: BrowserWindow): void {
   const { titleBarOverlay } = getWindowTitleBarOptions();
   if (typeof titleBarOverlay === "object") {
     window.setTitleBarOverlay(titleBarOverlay);
+  }
+  if (process.platform === "darwin") {
+    window.setWindowButtonVisibility(!clientSettings.hideWindowControls);
   }
 }
 
