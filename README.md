@@ -1,6 +1,6 @@
 # k3code
 
-k3code is a minimal web GUI for coding agents (currently Codex and Claude, more coming soon).
+k3code is a minimal web GUI for coding agents (currently Codex, Claude, and OpenCode, more coming soon).
 
 ## Installation
 
