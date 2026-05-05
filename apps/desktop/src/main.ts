@@ -2073,6 +2073,8 @@ function createWindow(): BrowserWindow {
     },
   });
 
+  syncWindowAppearance(window);
+
   window.webContents.on("context-menu", (event, params) => {
     event.preventDefault();
 
