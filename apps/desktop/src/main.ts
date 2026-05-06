@@ -2010,24 +2010,31 @@ function getInitialWindowBackgroundColor(): string {
   return nativeTheme.shouldUseDarkColors ? "#0a0a0a" : "#ffffff";
 }
 
-function getWindowTitleBarOptions(): WindowTitleBarOptions {
+function getWindowTitleBarOptions(hideWindowControls: boolean): WindowTitleBarOptions {
   if (process.platform === "darwin") {
+    if (hideWindowControls) {
+      return { titleBarStyle: "hidden" };
+    }
     return {
       titleBarStyle: "hiddenInset",
       trafficLightPosition: { x: 16, y: 18 },
     };
   }
 
-  return {
-    titleBarStyle: "hidden",
-    titleBarOverlay: {
-      color: TITLEBAR_COLOR,
-      height: TITLEBAR_HEIGHT,
-      symbolColor: nativeTheme.shouldUseDarkColors
-        ? TITLEBAR_DARK_SYMBOL_COLOR
-        : TITLEBAR_LIGHT_SYMBOL_COLOR,
-    },
-  };
+  if (hideWindowControls) {
+    return {
+      titleBarStyle: "hidden",
+      titleBarOverlay: {
+        color: TITLEBAR_COLOR,
+        height: TITLEBAR_HEIGHT,
+        symbolColor: nativeTheme.shouldUseDarkColors
+          ? TITLEBAR_DARK_SYMBOL_COLOR
+          : TITLEBAR_LIGHT_SYMBOL_COLOR,
+      },
+    };
+  }
+
+  return { titleBarStyle: "default" };
 }
 
 function syncWindowAppearance(window: BrowserWindow): void {
@@ -2036,12 +2043,9 @@ function syncWindowAppearance(window: BrowserWindow): void {
   }
 
   window.setBackgroundColor(getInitialWindowBackgroundColor());
-  const { titleBarOverlay } = getWindowTitleBarOptions();
+  const { titleBarOverlay } = getWindowTitleBarOptions(clientSettings.hideWindowControls);
   if (typeof titleBarOverlay === "object") {
     window.setTitleBarOverlay(titleBarOverlay);
-  }
-  if (process.platform === "darwin") {
-    window.setWindowButtonVisibility(!clientSettings.hideWindowControls);
   }
 }
 
@@ -2064,7 +2068,7 @@ function createWindow(): BrowserWindow {
     backgroundColor: getInitialWindowBackgroundColor(),
     ...getIconOption(),
     title: APP_DISPLAY_NAME,
-    ...getWindowTitleBarOptions(),
+    ...getWindowTitleBarOptions(clientSettings.hideWindowControls),
     webPreferences: {
       preload: Path.join(__dirname, "preload.cjs"),
       contextIsolation: true,
