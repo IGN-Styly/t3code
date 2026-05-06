@@ -943,7 +943,9 @@ export function GeneralSettingsPanel() {
         <SettingsRow
           title="Window controls"
           description={
-            isElectron ? "Hide the desktop minimize, maximize, and close buttons." : "Desktop only."
+            isElectron
+              ? "Hide the desktop minimize, maximize, and close buttons. Applies after app relaunch."
+              : "Desktop only."
           }
           resetAction={
             settings.hideWindowControls !== DEFAULT_UNIFIED_SETTINGS.hideWindowControls ? (
